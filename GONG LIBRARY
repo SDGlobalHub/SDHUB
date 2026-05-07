@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gong Library · SD Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1B2B6B;
+    --navy-dark: #111d4a;
+    --navy-light: #2a3e8c;
+    --gold: #E8A020;
+    --gold-light: #f5b940;
+    --gold-pale: #FEF3DC;
+    --white: #ffffff;
+    --gray-50: #f8f8f5;
+    --gray-100: #f0efe8;
+    --gray-200: #e0dfd8;
+    --gray-400: #9a9990;
+    --gray-600: #5f5e58;
+    --text: #1a1a18;
+    --text-muted: #6b6a65;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.12), 0 8px 28px rgba(0,0,0,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Barlow', sans-serif; background: var(--gray-50); color: var(--text); min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--navy);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 52px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .site-logo {
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .site-nav { display: flex; gap: 0; overflow-x: auto; }
+  .site-nav a {
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 1rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .site-nav a:hover { color: white; }
+  .site-nav a.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--navy);
+    padding: 3rem 2.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    background: rgba(232,160,32,0.08);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -80px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(232,160,32,0.05);
+  }
+  .hero-inner { max-width: 680px; position: relative; z-index: 1; }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 0.75rem;
+  }
+  .hero h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 52px; font-weight: 800;
+    color: white; line-height: 1;
+    letter-spacing: -0.5px; margin-bottom: 1rem;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p { font-size: 15px; color: rgba(255,255,255,0.72); line-height: 1.6; max-width: 520px; }
+  .hero-stats {
+    display: flex; gap: 2rem;
+    margin-top: 2rem; padding-top: 1.5rem;
+    border-top: 0.5px solid rgba(255,255,255,0.12);
+  }
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+
+  /* ── FILTERS ── */
+  .filters-wrap {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0.75rem 2.5rem;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .filter-row {
+    display: flex; align-items: center;
+    gap: 0.5rem; flex-wrap: wrap;
+    padding: 0.3rem 0;
+  }
+  .filter-row + .filter-row {
+    border-top: 1px solid var(--gray-100);
+    margin-top: 0.4rem; padding-top: 0.6rem;
+  }
+  .filter-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; color: var(--text-muted);
+    text-transform: uppercase;
+    min-width: 52px; margin-right: 2px;
+  }
+  .pill {
+    font-size: 12px; font-weight: 600;
+    padding: 4px 13px; border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    background: white; cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--navy); color: var(--navy); }
+  .pill.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .pill.region.active { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+  /* ── MAIN ── */
+  .main { padding: 2rem 2.5rem 4rem; max-width: 1200px; }
+  .section-header {
+    display: flex; align-items: baseline;
+    gap: 0.75rem; margin-bottom: 1.25rem; margin-top: 1.5rem;
+  }
+  .section-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted);
+  }
+  .section-count { font-size: 11px; color: var(--gray-400); }
+
+  /* ── CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--gray-200); padding: 1.25rem;
+    transition: transform 0.18s, box-shadow 0.18s;
+    display: flex; flex-direction: column;
+    animation: fadeUp 0.4s ease both;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #E8F0FB; color: var(--navy);
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; letter-spacing: 0.5px;
+  }
+  .avatar.gold-av { background: var(--gold-pale); color: #8B5E0A; }
+  .rep-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .rep-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .skill-badge {
+    display: inline-flex; align-items: center;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .region-badge {
+    display: inline-flex; align-items: center;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    background: var(--gold-pale); color: #8B5E0A;
+  }
+  .badge-blue { background: #E6F1FB; color: #185FA5; }
+  .badge-green { background: #EAF3DE; color: #3B6D11; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-purple { background: #EEEDFE; color: #534AB7; }
+  .badge-teal { background: #E1F5EE; color: #0F6E56; }
+  .badge-coral { background: #FAECE7; color: #993C1D; }
+  .badge-pink { background: #FBEAF0; color: #993556; }
+
+  .listen-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 5px;
+  }
+  .listen-text { font-size: 13px; color: var(--text); line-height: 1.55; flex: 1; }
+
+  .card-footer {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .timestamp {
+    font-size: 11px; font-weight: 600; color: var(--gold);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .timestamp::before {
+    content: '';
+    display: inline-block; width: 0; height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid var(--gold);
+  }
+  .gong-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--navy); color: white;
+    font-size: 12px; font-weight: 600;
+    font-family: 'Barlow', sans-serif;
+    padding: 7px 14px; border-radius: var(--radius-sm);
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .gong-btn:hover { background: var(--navy-light); }
+  .gong-btn.coming-soon {
+    background: var(--gray-200); color: var(--text-muted); cursor: default;
+  }
+  .gong-btn svg { width: 12px; height: 12px; fill: white; }
+  .gong-btn.coming-soon svg { fill: var(--text-muted); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { display: none; text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+  .empty-state.visible { display: block; }
+  .empty-icon { font-size: 36px; margin-bottom: 1rem; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--navy); padding: 1.5rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer p { font-size: 12px; color: rgba(255,255,255,0.45); }
+  .footer-badge { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .site-header { padding: 0 1rem; }
+    .site-nav a { padding: 0 0.6rem; font-size: 12px; }
+    .hero { padding: 2rem 1.25rem 2rem; }
+    .hero h1 { font-size: 36px; }
+    .hero-stats { gap: 1.25rem; }
+    .filters-wrap { padding: 0.75rem 1rem; }
+    .main { padding: 1.5rem 1rem 3rem; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="site-logo">SD Hub</div>
+  <nav class="site-nav">
+    <a href="#" class="active">Gong Library</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">SD Hub · Best Call Library</div>
+    <h1>GONG<br><span>LIBRARY</span></h1>
+    <p>Real calls from your teammates across APAC, NAMER and EMEAL. Each snippet is tagged with the skill and region, with a timestamp so you know exactly where to listen.</p>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num" id="total-count">6</div>
+        <div class="stat-label">Call snippets</div>
+      </div>
+      <div>
+        <div class="stat-num">7</div>
+        <div class="stat-label">Skills covered</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Regions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="filters-wrap">
+  <div class="filter-row">
+    <span class="filter-label">Skill</span>
+    <button class="pill active" data-type="skill" data-filter="all">All</button>
+    <button class="pill" data-type="skill" data-filter="objection">Objection handling</button>
+    <button class="pill" data-type="skill" data-filter="rapport">Building rapport</button>
+    <button class="pill" data-type="skill" data-filter="discovery">Discovery & listening</button>
+    <button class="pill" data-type="skill" data-filter="creative">Creative problem solving</button>
+    <button class="pill" data-type="skill" data-filter="qualification">Needs qualification</button>
+    <button class="pill" data-type="skill" data-filter="closing">Closing & next steps</button>
+    <button class="pill" data-type="skill" data-filter="storytelling">Storytelling</button>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Region</span>
+    <button class="pill region active" data-type="region" data-filter="all">All regions</button>
+    <button class="pill region" data-type="region" data-filter="apac">APAC</button>
+    <button class="pill region" data-type="region" data-filter="namer">NAMER</button>
+    <button class="pill region" data-type="region" data-filter="emeal">EMEAL</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="section-header">
+    <span class="section-title">All calls</span>
+    <span class="section-count" id="result-count">6 snippets</span>
+  </div>
+
+  <div class="cards-grid" id="cards-grid">
+
+    <!-- CARD 1 -->
+    <div class="card" data-skill="objection" data-region="apac">
+      <div class="card-top">
+        <div class="avatar">YS</div>
+        <div>
+          <div class="rep-name">Yasmeen Sarbudeen</div>
+          <div class="rep-role">SDR 1 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-blue">Objection handling</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">How Yasmeen validates a frustrated buyer's feelings and de-escalates a potential cancellation — without giving in or being pushy. Notice how she keeps the door open for the buyer to explain more.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 2:14</span>
+        <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=999592193645592606&from=248&to=371" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="card" data-skill="rapport" data-region="apac">
+      <div class="card-top">
+        <div class="avatar">YS</div>
+        <div>
+          <div class="rep-name">Yasmeen Sarbudeen</div>
+          <div class="rep-role">SDR 1 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-green">Building rapport</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">Natural, unhurried small talk about a Bali trip that creates real warmth before business starts. Yasmeen asks follow-ups and shares a personal anecdote — making the buyer genuinely comfortable.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 0:45</span>
+        <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=4492761923644276745&from=9&to=703" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="card" data-skill="discovery" data-region="apac">
+      <div class="card-top">
+        <div class="avatar">YS</div>
+        <div>
+          <div class="rep-name">Yasmeen Sarbudeen</div>
+          <div class="rep-role">SDR 1 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-purple">Discovery & listening</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">Yasmeen keeps digging even after the buyer mentions budget constraints. She asks specific spend questions that uncover a real pain point — finding a senior finance manager — which opens the conversation back up.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 3:20</span>
+        <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=4492761923644276745&from=335&to=703" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+
+    <!-- CARD 4 -->
+    <div class="card" data-skill="creative" data-region="apac">
+      <div class="card-top">
+        <div class="avatar">YS</div>
+        <div>
+          <div class="rep-name">Yasmeen Sarbudeen</div>
+          <div class="rep-role">SDR 1 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-amber">Creative problem solving</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">Instead of pushing for a direct sale, Yasmeen pivots to a low-commitment recruitathon event with a 7-day free trial. A resistant buyer goes from "no" to "I'm happy to do that" in under 2 minutes.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 4:30</span>
+        <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=179370871914288798&from=448&to=725" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+
+    <!-- CARD 5 -->
+    <div class="card" data-skill="qualification" data-region="apac">
+      <div class="card-top">
+        <div class="avatar gold-av">AV</div>
+        <div>
+          <div class="rep-name">Ankita Vishwakarma</div>
+          <div class="rep-role">SDR 2 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-teal">Needs qualification</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">Ankita correctly identifies that Talent Solutions isn't the right fit for this buyer's goals. She's honest about it — and the buyer's trust actually increases as a result.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 3:10</span>
+        <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=1735932373839483429&from=1479&to=2419" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+
+    <!-- CARD 6 -->
+    <div class="card" data-skill="rapport" data-region="apac">
+      <div class="card-top">
+        <div class="avatar gold-av">AV</div>
+        <div>
+          <div class="rep-name">Ankita Vishwakarma</div>
+          <div class="rep-role">SDR 2 · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-green">Building rapport</span>
+        <span class="region-badge">APAC</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">Ankita summarizes the buyer's goals back to them in their own language, making Nirav feel genuinely heard. His continued engagement shows how powerful accurate reflection is in building trust.</div>
+      <div class="card-footer">
+        <span class="timestamp">Key moment at 1:55</span>
+        <a href="PASTE_GONG_LINK_HERE" target="_blank" class="gong-btn">
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Open in Gong
+        </a>
+      </div>
+    </div>
+<!-- CARD: ISHEMEET KAUR-->
+<div class="card" data-skill="qualification" data-region="apac">
+  <div class="card-top">
+    <div class="avatar">IK</div>
+    <div>
+      <div class="rep-name">Ishmeet Kaur</div>
+      <div class="rep-role">SDR · LinkedIn</div>
+    </div>
+  </div>
+  <div class="card-tags">
+    <span class="skill-badge badge-teal">Needs qualification</span>
+    <span class="region-badge">APAC</span>
+  </div>
+  <div class="listen-label">What to listen for</div>
+  <div class="listen-text">Ishmeet opens by asking about the business before pitching anything — surfacing a unique pain point (tier 3 & 4 hiring) the buyer wouldn't have volunteered. Watch how she probes deeper on why candidates aren't reachable, uncovers hiring scale, then directly tests urgency with "how soon are you intended to move ahead." A textbook needs qualification flow from open to close.</div>
+  <div class="card-footer">
+    <span class="timestamp">Key moment at 6:32</span>
+    <a href="https://linkedin-d365.app.gong.io/embedded-call?call-id=5424348789158505405&from=180&to=505" target="_blank" class="gong-btn">
+      <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+      Open in Gong
+    </a>
+  </div>
+</div>
+    <!-- PLACEHOLDER: NAMER -->
+    <div class="card" data-skill="closing" data-region="namer">
+      <div class="card-top">
+        <div class="avatar" style="background:#E1F5EE;color:#0F6E56;">—</div>
+        <div>
+          <div class="rep-name">Coming soon</div>
+          <div class="rep-role">NAMER rep · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-coral">Closing & next steps</span>
+        <span class="region-badge">NAMER</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">A great NAMER closing call is coming to this spot soon. Know a call worth featuring? Share it with your enablement team.</div>
+      <div class="card-footer">
+        <span class="timestamp">Link coming soon</span>
+        <button class="gong-btn coming-soon" disabled>
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Coming soon
+        </button>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER: EMEAL -->
+    <div class="card" data-skill="storytelling" data-region="emeal">
+      <div class="card-top">
+        <div class="avatar" style="background:#FBEAF0;color:#993556;">—</div>
+        <div>
+          <div class="rep-name">Coming soon</div>
+          <div class="rep-role">EMEAL rep · LinkedIn</div>
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="skill-badge badge-pink">Storytelling</span>
+        <span class="region-badge">EMEAL</span>
+      </div>
+      <div class="listen-label">What to listen for</div>
+      <div class="listen-text">A standout EMEAL storytelling call is coming here soon. Know a call worth featuring? Reach out to your enablement team to nominate it.</div>
+      <div class="card-footer">
+        <span class="timestamp">Link coming soon</span>
+        <button class="gong-btn coming-soon" disabled>
+          <svg viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11"/></svg>
+          Coming soon
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="empty-state" id="empty-state">
+    <div class="empty-icon">🎯</div>
+    <p>No calls found for this filter yet.<br>Check back soon — more snippets are on the way!</p>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>SD Hub · Updated regularly by your enablement team</p>
+  <span class="footer-badge">GONG LIBRARY</span>
+</footer>
+
+<script>
+  const allCards = Array.from(document.querySelectorAll('.card'));
+  const countEl = document.getElementById('result-count');
+  const emptyEl = document.getElementById('empty-state');
+
+  let activeSkill = 'all';
+  let activeRegion = 'all';
+
+  function applyFilters() {
+    let visible = 0;
+    allCards.forEach(card => {
+      const skillMatch = activeSkill === 'all' || card.dataset.skill === activeSkill;
+      const regionMatch = activeRegion === 'all' || card.dataset.region === activeRegion;
+      const show = skillMatch && regionMatch;
+      card.style.display = show ? 'flex' : 'none';
+      if (show) {
+        card.style.animationDelay = (visible * 0.05) + 's';
+        card.style.animation = 'none';
+        card.offsetHeight;
+        card.style.animation = '';
+        visible++;
+      }
+    });
+    countEl.textContent = visible + (visible === 1 ? ' snippet' : ' snippets');
+    emptyEl.classList.toggle('visible', visible === 0);
+  }
+
+  document.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const type = pill.dataset.type;
+      const filter = pill.dataset.filter;
+
+      document.querySelectorAll(`.pill[data-type="${type}"]`).forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      if (type === 'skill') activeSkill = filter;
+      if (type === 'region') activeRegion = filter;
+
+      applyFilters();
+    });
+  });
+</script>
+</body>
+</html>
